@@ -1,0 +1,6 @@
+__pycache__
+secret.py
+credentials.json
+src/
+tournamentData.csv
+.gitattributes
