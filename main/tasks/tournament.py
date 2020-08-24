@@ -1,6 +1,5 @@
 import challonge
 import csv
-from secret import api_user, api_key
     
 class Player:
     def __init__(self, username, name, id, rank):
@@ -100,7 +99,6 @@ def writeCSV(players, winners):
                 player.rank = '-'
             if not player.rank == None:
                 # Add data to dataList
-
                 dataList = [player.username, player.name, player.rank]
 
                 dataList.extend(['']*9)
@@ -112,10 +110,10 @@ def writeCSV(players, winners):
                 # Write dataList to csv
                 writer.writerows([dataList])
 
-def getTournamentCSV(user, key):
+def getTournamentCSV(user, key, subdomain, bracket_id):
     challonge.set_credentials(user, key)
 
-    tournament = challonge.tournaments.show("redditfighting-s2u03n9v") # Tournament link
+    tournament = challonge.tournaments.show(subdomain + "-" +bracket_id) # Tournament link
     tour_date = tournament["name"].split('(')[1].replace("/", "-")[:4]
 
     participants = challonge.participants.index(tournament["id"])
@@ -128,5 +126,3 @@ def getTournamentCSV(user, key):
     writeCSV(players, winners)
     
     return tour_date
-
-print(getTournamentCSV(api_user, api_key))

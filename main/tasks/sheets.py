@@ -4,12 +4,13 @@ from google.oauth2 import service_account # Google Authentication
 import os # OS-independent way of getting directory paths
 import csv # File processing
 from collections import OrderedDict # Most efficient way to get unique list values
-import datetime
+import datetime # Dates!
 
 def updateSeeding(spreadsheet_id, tour_date, last_tour_date, new_month=False):
     last_tour_datetime = datetime.datetime.strptime(last_tour_date + str(datetime.datetime.today().year), '%m-%d%Y')
     new_tour_datetime = datetime.datetime.strptime(tour_date + str(datetime.datetime.today().year), '%m-%d%Y')
     if last_tour_datetime.month - new_tour_datetime.month != 0:
+        print("New Month Detected")
         new_month = True
     tour_delta = ((new_tour_datetime - last_tour_datetime).days)
 
@@ -333,6 +334,7 @@ def updateSeeding(spreadsheet_id, tour_date, last_tour_date, new_month=False):
 
     # Delete the first instance of each name (This will be the row with the placement column NOT filled in)
     deleteRequests(service, spreadsheet_id, new_sheet_id, [names.index(name)+2 for name in dup_names2])
+    print("All DeleteRequests processed")
 
     # Get the values to update columns D and E in Attendance
     attend_values = getValues(service, spreadsheet_id, 'Attendance')
@@ -848,11 +850,11 @@ def updateSeeding(spreadsheet_id, tour_date, last_tour_date, new_month=False):
     body = {}
     body.update({"requests": requests})
     result = service.spreadsheets().batchUpdate(spreadsheetId=spreadsheet_id, body=body).execute()
+    print("All Updates processed")
 
     ids.insert(-6, new_sheet_id)
     sortRanges(service, spreadsheet_id, ids)
-
-    return "Hi"
+    print("Sorting processed")
 
 def getValues(service, spreadsheet_id, sheet_name):
     return service.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range="'" + sheet_name + "'!A1:Z", valueRenderOption='FORMULA').execute().get('values', [])
@@ -903,21 +905,18 @@ def deleteRequests(service, spreadsheet_id, sheet_id, delete_indices):
             }
             result = service.spreadsheets().batchUpdate(spreadsheetId=spreadsheet_id, body=body).execute()
             deleteReqs = []
-            print("20 Delete Requests processed")
         elif len(deleteReqs) >= 10 and len(deleteReqs) + rev_i <= 20:
             body = {
                 'requests': deleteReqs
             }
             result = service.spreadsheets().batchUpdate(spreadsheetId=spreadsheet_id, body=body).execute()
             deleteReqs = []
-            print("10 Delete Requests processed")
         elif len(deleteReqs) + rev_i <= 10: 
             body = {
                 'requests': deleteReqs
             }
             result = service.spreadsheets().batchUpdate(spreadsheetId=spreadsheet_id, body=body).execute()
             deleteReqs = []
-            print("Delete Request processed")
         rev_i -= 1
 
 def sortRanges(service, spreadsheet_id, ids):
@@ -989,5 +988,3 @@ def sortRanges(service, spreadsheet_id, ids):
         }]
     }
     result = service.spreadsheets().batchUpdate(spreadsheetId=spreadsheet_id, body=body).execute()
-
-print(updateSeeding('1Msq8pgWFj83DwLumVdgk84fSmBG_Uq3UcaJ7Ro_mk6Q', '08-17', '08-10', new_month=True))
