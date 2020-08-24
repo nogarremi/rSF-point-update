@@ -849,6 +849,9 @@ def updateSeeding(spreadsheet_id, tour_date, last_tour_date, new_month=False):
     body.update({"requests": requests})
     result = service.spreadsheets().batchUpdate(spreadsheetId=spreadsheet_id, body=body).execute()
 
+    ids.insert(-6, new_sheet_id)
+    sortRanges(service, spreadsheet_id, ids)
+
     return "Hi"
 
 def getValues(service, spreadsheet_id, sheet_name):
@@ -916,5 +919,75 @@ def deleteRequests(service, spreadsheet_id, sheet_id, delete_indices):
             deleteReqs = []
             print("Delete Request processed")
         rev_i -= 1
+
+def sortRanges(service, spreadsheet_id, ids):
+    body = {
+        "requests": [{
+            'sortRange': {
+                'range': {
+                    'sheetId': ids[0],
+                    'startRowIndex': 1,
+                    'startColumnIndex': 0
+                },
+                'sortSpecs': [{
+                    'sortOrder': 'ASCENDING',
+                    'dimensionIndex': 1
+                }]
+            }
+        },
+        {
+            'sortRange': {
+                'range': {
+                    'sheetId': ids[-7],
+                    'startRowIndex': 2,
+                    'startColumnIndex': 0
+                },
+                'sortSpecs': [{
+                    'sortOrder': 'ASCENDING',
+                    'dimensionIndex': 2
+                }]
+            }
+        },
+        {
+            'sortRange': {
+                'range': {
+                    'sheetId': ids[-6],
+                    'startRowIndex': 1,
+                    'startColumnIndex': 0
+                },
+                'sortSpecs': [{
+                    'sortOrder': 'ASCENDING',
+                    'dimensionIndex': 1
+                }]
+            }
+        },
+        {
+            'sortRange': {
+                'range': {
+                    'sheetId': ids[-4],
+                    'startRowIndex': 1,
+                    'startColumnIndex': 0
+                },
+                'sortSpecs': [{
+                    'sortOrder': 'ASCENDING',
+                    'dimensionIndex': 1
+                }]
+            }
+        },
+        {
+            'sortRange': {
+                'range': {
+                    'sheetId': ids[-2],
+                    'startRowIndex': 1,
+                    'startColumnIndex': 0
+                },
+                'sortSpecs': [{
+                    'sortOrder': 'ASCENDING',
+                    'dimensionIndex': 1
+                }]
+            }
+        }]
+    }
+    result = service.spreadsheets().batchUpdate(spreadsheetId=spreadsheet_id, body=body).execute()
 
 print(updateSeeding('1Msq8pgWFj83DwLumVdgk84fSmBG_Uq3UcaJ7Ro_mk6Q', '08-17', '08-10', new_month=True))
